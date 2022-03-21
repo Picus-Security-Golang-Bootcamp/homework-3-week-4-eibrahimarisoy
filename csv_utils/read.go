@@ -5,7 +5,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
 )
 
 func ReadCSV(filename string) ([]book.Book, error) {
@@ -21,7 +22,7 @@ func ReadCSV(filename string) ([]book.Book, error) {
 		return nil, err
 	}
 
-	var locations []book.Book
+	var books []book.Book
 	for _, line := range records[1:] {
 
 		id, err := strconv.Atoi(line[0])
@@ -47,12 +48,12 @@ func ReadCSV(filename string) ([]book.Book, error) {
 		if err != nil {
 			IsDeleted = false
 		}
-		authorID, err := strconv.Atoi(line[6])
+		authorID, err := strconv.Atoi(line[8])
 		if err != nil {
 			authorID = 0
 		}
 
-		locations = append(locations, book.Book{
+		books = append(books, book.Book{
 			ID:         id,
 			Name:       line[1],
 			Pages:      pages,
@@ -61,9 +62,9 @@ func ReadCSV(filename string) ([]book.Book, error) {
 			StockCode:  line[5],
 			ISBN:       line[6],
 			IsDeleted:  IsDeleted,
-			Author:     book.NewAuthor(authorID, line[9]),
+			Author:     author.Author{ID: authorID, Name: line[9]},
 		})
 	}
 
-	return locations, nil
+	return books, nil
 }

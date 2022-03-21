@@ -5,7 +5,10 @@ import (
 	"log"
 
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/csv_utils"
+
 	"github.com/joho/godotenv"
 )
 
@@ -16,16 +19,32 @@ func main() {
 	}
 
 	// connect postgres database
-	_, err := db.NewPsqlDB()
+	db, err := db.NewPsqlDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Read CSV file
-	books, err := csv_utils.ReadCSV("data.csv")
+	books, err1 := csv_utils.ReadCSV("data.csv")
+	if err1 != nil {
+		panic(err)
+	}
+
+	// Repositories
+	authorRepo := author.NewAuthorRepository(db)
+	authorRepo.Migrations()
+
+	bookRepo := book.NewBookRepository(db)
+	bookRepo.Migrations()
+	bookRepo.InsertSampleData(books)
+
+	books, err = bookRepo.GetAllBooksWithoutAuthorInformation()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Books:", books)
 
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+	fmt.Println("Done")
 }

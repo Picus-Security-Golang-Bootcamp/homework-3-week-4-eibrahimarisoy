@@ -13,7 +13,7 @@ type Author struct {
 }
 
 func (Author) TableName() string {
-	return "authors"
+	return "author"
 }
 
 func (a *Author) ToString() string {
