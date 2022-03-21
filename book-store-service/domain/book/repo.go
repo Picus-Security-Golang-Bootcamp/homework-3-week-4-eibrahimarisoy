@@ -16,17 +16,11 @@ func (r *BookRepository) Migrations() {
 	r.db.AutoMigrate(&Book{})
 }
 
-func (r *BookRepository) InsertSampleData(books []Book) {
+func (r *BookRepository) InsertSampleData(book Book) {
 
-	for _, book := range books {
-		// qa := a.db.Where(author.Author{Name: book.Author.Name, ID: book.Author.ID}).
-		// 	FirstOrCreate(&book.Author)
-
-		r.db.Where(Book{Name: book.Name}).
-			Attrs(Book{Name: book.Name, ID: book.ID}).
-			FirstOrCreate(&book)
-
-	}
+	r.db.Where(Book{Name: book.Name}).
+		Attrs(Book{Name: book.Name, ID: book.ID}).
+		FirstOrCreate(&book)
 }
 
 func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]Book, error) {

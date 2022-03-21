@@ -1,6 +1,8 @@
 package author
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -17,11 +19,10 @@ func (a *AuthorRepository) Migrations() {
 	a.db.AutoMigrate(&Author{})
 }
 
-func (a *AuthorRepository) InsertSampleData(authors []Author) {
-
-	for _, author := range authors {
-		a.db.Where(Author{Name: author.Name}).
-			Attrs(Author{Name: author.Name, ID: author.ID}).
-			FirstOrCreate(&author)
-	}
+func (a *AuthorRepository) InsertSampleData(author Author) {
+	fmt.Println("Inserting author: ", author.Name)
+	fmt.Println("Inserting author: ", author.ID)
+	a.db.Where(Author{Name: author.Name, ID: author.ID}).
+		Attrs(Author{ID: author.ID}).
+		FirstOrCreate(&author)
 }

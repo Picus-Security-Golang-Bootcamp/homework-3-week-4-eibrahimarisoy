@@ -36,7 +36,7 @@ func main() {
 
 	bookRepo := book.NewBookRepository(db)
 	bookRepo.Migrations()
-	bookRepo.InsertSampleData(books)
+	InsertSampleData(books, authorRepo, bookRepo)
 
 	books, err = bookRepo.GetAllBooksWithoutAuthorInformation()
 	if err != nil {
@@ -47,4 +47,14 @@ func main() {
 		fmt.Println(book.ToString())
 	}
 	fmt.Println("Done")
+}
+
+func InsertSampleData(books []book.Book, a *author.AuthorRepository, b *book.BookRepository) {
+
+	for _, v := range books {
+		a.InsertSampleData(v.Author)
+		v.Author.ID = 0
+		v.Author.Name = ""
+		b.InsertSampleData(v)
+	}
 }
