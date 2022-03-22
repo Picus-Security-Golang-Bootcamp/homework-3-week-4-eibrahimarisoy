@@ -8,7 +8,6 @@ import (
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/csv_utils"
 )
 
 type BookStore struct {
@@ -26,10 +25,7 @@ func NewBookStore() (BookStore, error) {
 	}
 
 	// Read CSV file
-	books, err := csv_utils.ReadCSV("data.csv")
-	if err != nil {
-		panic(err)
-	}
+	books := ReadBookWithWorkerPool("data.csv")
 
 	// Repositories
 	authorRepo := author.NewAuthorRepository(db)
