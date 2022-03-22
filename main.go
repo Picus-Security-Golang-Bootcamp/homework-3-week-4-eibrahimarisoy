@@ -1,16 +1,30 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/csv_utils"
-
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/bookStore"
 	"github.com/joho/godotenv"
 )
+
+// define usage information
+var usage = `Usage: ./ [commands...] [parameters...]
+
+Commands:
+	-list
+	-search <bookName>
+	-get <bookID>
+	-delete <bookID>
+	-buy <bookID> <quantity>
+
+Parameters:
+	-keyword: string
+	-bookID: int
+	-quantity: int
+`
 
 func main() {
 	// Set environment variables
@@ -18,43 +32,37 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	// connect postgres database
-	db, err := db.NewPsqlDB()
+	flag.Usage = func() {
+		fmt.Fprint(os.Stderr, fmt.Sprintf(usage))
+	}
+
+	args := os.Args[1:]
+
+	bs, err := bookStore.NewBookStore()
+
 	if err != nil {
-		log.Fatal(err)
+		usageAndExit(err.Error())
 	}
 
-	// Read CSV file
-	books, err1 := csv_utils.ReadCSV("data.csv")
-	if err1 != nil {
-		panic(err)
+	if err := bs.Run(args); err != nil {
+		usageAndExit(err.Error())
 	}
+	// books, err = bookRepo.GetAllBooksWithAuthorInformation()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	// Repositories
-	authorRepo := author.NewAuthorRepository(db)
-	authorRepo.Migrations()
-
-	bookRepo := book.NewBookRepository(db)
-	bookRepo.Migrations()
-
-	InsertSampleData(books, authorRepo, bookRepo)
-
-	books, err = bookRepo.GetAllBooksWithAuthorInformation()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, book := range books {
-		fmt.Println(book.ToString())
-	}
-	fmt.Println("Done")
+	// for _, book := range books {
+	// 	fmt.Println(book.ToString())
+	// }
+	// fmt.Println("Done")
 }
 
-func InsertSampleData(books []book.Book, a *author.AuthorRepository, b *book.BookRepository) {
+func usageAndExit(msg string) {
+	fmt.Fprintf(os.Stderr, msg)
+	fmt.Fprintf(os.Stderr, "\n\n")
+	flag.Usage()
+	fmt.Fprintf(os.Stderr, "\n")
 
-	for _, v := range books {
-		newAuthor := a.InsertSampleData(&v.Author)
-		v.AuthorID = newAuthor.ID
-		b.InsertSampleData(v)
-	}
+	os.Exit(1)
 }

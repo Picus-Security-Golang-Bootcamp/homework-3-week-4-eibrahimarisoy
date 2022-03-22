@@ -40,3 +40,13 @@ func (r *BookRepository) GetAllBooksWithAuthorInformation() ([]Book, error) {
 	}
 	return books, nil
 }
+
+func (r *BookRepository) SearchBookNameWithKeyword(keyword string) ([]Book, error) {
+	var books []Book
+
+	result := r.db.Preload("Author").Where("name ILIKE ?", "%"+keyword+"%").Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
