@@ -36,9 +36,10 @@ func main() {
 
 	bookRepo := book.NewBookRepository(db)
 	bookRepo.Migrations()
+
 	InsertSampleData(books, authorRepo, bookRepo)
 
-	books, err = bookRepo.GetAllBooksWithoutAuthorInformation()
+	books, err = bookRepo.GetAllBooksWithAuthorInformation()
 	if err != nil {
 		panic(err)
 	}
@@ -52,9 +53,8 @@ func main() {
 func InsertSampleData(books []book.Book, a *author.AuthorRepository, b *book.BookRepository) {
 
 	for _, v := range books {
-		a.InsertSampleData(v.Author)
-		v.Author.ID = 0
-		v.Author.Name = ""
+		newAuthor := a.InsertSampleData(&v.Author)
+		v.AuthorID = newAuthor.ID
 		b.InsertSampleData(v)
 	}
 }

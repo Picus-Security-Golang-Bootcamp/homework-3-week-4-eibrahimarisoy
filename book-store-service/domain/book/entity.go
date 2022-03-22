@@ -9,15 +9,15 @@ import (
 
 type Book struct {
 	gorm.Model
-	ID         int     `json:"id"`
 	Name       string  `json:"name"`
 	Pages      int     `json:"pages"`
 	StockCount int     `json:"stock_count"`
 	Price      float64 `json:"price"`
 	StockCode  string  `json:"stock_code"`
 	ISBN       string
-	IsDeleted  bool          `json:"isDeleted"`
-	Author     author.Author `gorm:"foreignkey:ID"`
+	IsDeleted  bool `json:"isDeleted"`
+	AuthorID   uint `gorm:"foreignKey:ID"`
+	Author     author.Author
 }
 
 func (Book) TableName() string {

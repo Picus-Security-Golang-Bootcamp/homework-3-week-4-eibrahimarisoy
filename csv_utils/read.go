@@ -25,45 +25,39 @@ func ReadCSV(filename string) ([]book.Book, error) {
 	var books []book.Book
 	for _, line := range records[1:] {
 
-		id, err := strconv.Atoi(line[0])
-		if err != nil {
-			id = 0
-		}
-
-		pages, err := strconv.Atoi(line[2])
+		pages, err := strconv.Atoi(line[1])
 		if err != nil {
 			pages = 0
 		}
 
-		stockCount, err := strconv.Atoi(line[3])
+		stockCount, err := strconv.Atoi(line[2])
 		if err != nil {
 			stockCount = 0
 		}
 
-		price, err := strconv.ParseFloat(line[4], 64)
+		price, err := strconv.ParseFloat(line[3], 64)
 		if err != nil {
 			price = 0
 		}
-		IsDeleted, err := strconv.ParseBool(line[5])
+		IsDeleted, err := strconv.ParseBool(line[6])
 		if err != nil {
 			IsDeleted = false
 		}
-		authorID, err := strconv.Atoi(line[8])
+		authorID, err := strconv.Atoi(line[7])
 		if err != nil {
 			authorID = 0
 		}
-
 		books = append(books, book.Book{
-			ID:         id,
-			Name:       line[1],
+			Name:       line[0],
 			Pages:      pages,
 			StockCount: stockCount,
 			Price:      price,
-			StockCode:  line[5],
-			ISBN:       line[6],
+			StockCode:  line[4],
+			ISBN:       line[5],
 			IsDeleted:  IsDeleted,
-			Author:     author.Author{ID: authorID, Name: line[9]},
+			Author:     author.Author{ID: uint(authorID), Name: line[8]},
 		})
+
 	}
 
 	return books, nil
