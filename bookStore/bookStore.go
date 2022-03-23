@@ -12,21 +12,17 @@ import (
 )
 
 type BookStore struct {
-	Books      []*book.Book
 	bookRepo   *book.BookRepository
 	authorRepo *author.AuthorRepository
 }
 
-// NewBookStore
-func NewBookStore() (BookStore, error) {
+// NewBookStore creates a new BookStore
+func NewBookStore() BookStore {
 	// connect postgres database
 	db, err := db.NewPsqlDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// Read CSV file
-	books := ReadBookWithWorkerPool("data.csv")
 
 	// Repositories
 	authorRepo := author.NewAuthorRepository(db)
@@ -35,20 +31,12 @@ func NewBookStore() (BookStore, error) {
 	bookRepo := book.NewBookRepository(db)
 	bookRepo.Migrations()
 
-	InsertSampleData(books, authorRepo, bookRepo)
+	// Read CSV file and insert data into database with worker pool
+	ReadAndWriteBookWithWorkerPool("data.csv", bookRepo, authorRepo)
 
-	var newBookStore = BookStore{bookRepo: bookRepo, authorRepo: authorRepo}
+	// initialize and return BookStore
+	return BookStore{bookRepo: bookRepo, authorRepo: authorRepo}
 
-	return newBookStore, nil
-}
-
-func InsertSampleData(results chan book.Book, a *author.AuthorRepository, b *book.BookRepository) {
-
-	for v := range results {
-		newAuthor := a.InsertSampleData(&v.Author)
-		v.AuthorID = newAuthor.ID
-		b.InsertSampleData(v)
-	}
 }
 
 // Run runs the bookStore given the command and the arguments
@@ -166,7 +154,7 @@ func (bs BookStore) Run(args []string) error {
 	return nil
 }
 
-// List prints all the books in bookStore
+// PrintBooks prints the books given
 func PrintBooks(books []book.Book) {
 
 	for _, v := range books {

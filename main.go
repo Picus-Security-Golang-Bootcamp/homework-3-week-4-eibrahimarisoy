@@ -38,26 +38,13 @@ func main() {
 
 	args := os.Args[1:]
 
-	bs, err := bookStore.NewBookStore()
-
-	if err != nil {
+	if err := bookStore.NewBookStore().Run(args); err != nil {
 		usageAndExit(err.Error())
 	}
 
-	if err := bs.Run(args); err != nil {
-		usageAndExit(err.Error())
-	}
-	// books, err = bookRepo.GetAllBooksWithAuthorInformation()
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// for _, book := range books {
-	// 	fmt.Println(book.ToString())
-	// }
-	// fmt.Println("Done")
 }
 
+// usageAndExit prints the usage information and exits with the given error message.
 func usageAndExit(msg string) {
 	fmt.Fprintf(os.Stderr, msg)
 	fmt.Fprintf(os.Stderr, "\n\n")

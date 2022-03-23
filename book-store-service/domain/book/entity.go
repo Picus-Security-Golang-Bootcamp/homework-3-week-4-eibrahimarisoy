@@ -15,7 +15,6 @@ type Book struct {
 	Price      float64 `json:"price"`
 	StockCode  string  `json:"stock_code"`
 	ISBN       string
-	IsDeleted  bool `json:"isDeleted"`
 	AuthorID   uint `gorm:"foreignKey:ID"`
 	Author     author.Author
 }
@@ -26,7 +25,7 @@ func (Book) TableName() string {
 
 func (b *Book) ToString() string {
 	if b.Author.ID != 0 {
-		return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t AuthorID: %v AuthorName: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted, b.Author.ID, b.Author.Name, b.DeletedAt)
+		return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s AuthorID: %v AuthorName: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.Author.ID, b.Author.Name, b.DeletedAt)
 	}
-	return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t, DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted, b.DeletedAt)
+	return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.DeletedAt)
 }

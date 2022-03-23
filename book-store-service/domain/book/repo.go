@@ -17,7 +17,7 @@ func (r *BookRepository) Migrations() {
 }
 
 func (r *BookRepository) InsertSampleData(b Book) {
-	r.db.Omit("Author").Where(Book{Name: b.Name}).
+	r.db.Unscoped().Omit("Author").Where(Book{Name: b.Name}).
 		FirstOrCreate(&b)
 }
 
@@ -34,7 +34,7 @@ func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]Book, error) {
 func (r *BookRepository) GetAllBooksWithAuthorInformation() ([]Book, error) {
 	var books []Book
 
-	result := r.db.Unscoped().Preload("Author").Find(&books)
+	result := r.db.Unscoped().Preload("Author").Order("id").Find(&books)
 	if result.Error != nil {
 		return nil, result.Error
 	}
