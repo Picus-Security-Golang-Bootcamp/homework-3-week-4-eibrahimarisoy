@@ -26,7 +26,7 @@ func (Book) TableName() string {
 
 func (b *Book) ToString() string {
 	if b.Author.ID != 0 {
-		return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t AuthorID: %v AuthorName: %s", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted, b.Author.ID, b.Author.Name)
+		return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t AuthorID: %v AuthorName: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted, b.Author.ID, b.Author.Name, b.DeletedAt)
 	}
-	return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted)
+	return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s IsDeleted: %t, DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.IsDeleted, b.DeletedAt)
 }

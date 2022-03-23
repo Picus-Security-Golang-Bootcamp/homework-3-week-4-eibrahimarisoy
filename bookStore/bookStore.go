@@ -100,29 +100,25 @@ func (bs BookStore) Run(args []string) error {
 		}
 		fmt.Println(result.ToString())
 
-	// case "delete":
-	// 	// if the user has not provided <bookID>
-	// 	if len(args) < 2 {
-	// 		return fmt.Errorf("No book id provided")
-	// 	}
+	case "delete":
+		// if the user has not provided <bookID>
+		if len(args) < 2 {
+			return fmt.Errorf("No book id provided")
+		}
 
-	// 	bookId, err := strconv.Atoi(args[1])
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		bookId, err := strconv.Atoi(args[1])
+		if err != nil {
+			return err
+		}
 
-	// 	index, err := bs.Get(bookId)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		err = bs.bookRepo.DeleteBookByID(bookId)
+		if err != nil {
+			return err
+		}
 
-	// 	fmt.Println(strings.Repeat("-", 50))
-	// 	fmt.Println("Deleting book:")
-	// 	bs.Books[index].BookInfo()
-	// 	fmt.Println(strings.Repeat("-", 50))
-
-	// 	bs.Delete(index)
-	// 	bs.List()
+		fmt.Println(strings.Repeat("-", 50))
+		fmt.Println("Deleting book id:", bookId)
+		fmt.Println(strings.Repeat("-", 50))
 
 	// case "buy":
 	// 	// if the user has not provided <bookID> or <quantity>

@@ -34,7 +34,7 @@ func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]Book, error) {
 func (r *BookRepository) GetAllBooksWithAuthorInformation() ([]Book, error) {
 	var books []Book
 
-	result := r.db.Preload("Author").Find(&books)
+	result := r.db.Unscoped().Preload("Author").Find(&books)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -54,9 +54,17 @@ func (r *BookRepository) SearchBookNameWithKeyword(keyword string) ([]Book, erro
 func (r *BookRepository) GetBookByIDWithAuthor(id int) (Book, error) {
 	var book Book
 
-	result := r.db.Preload("Author").Where("id = ?", id).First(&book)
+	result := r.db.Unscoped().Preload("Author").Where("id = ?", id).First(&book)
 	if result.Error != nil {
 		return Book{}, result.Error
 	}
 	return book, nil
+}
+
+func (r *BookRepository) DeleteBookByID(id int) error {
+	result := r.db.Where("id = ?", id).Delete(&Book{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }
