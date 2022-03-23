@@ -11,9 +11,9 @@ import (
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
 )
 
-func ReadBookWithWorkerPool(path string) []book.Book {
+func ReadBookWithWorkerPool(path string) chan book.Book {
 
-	const workerCount = 10
+	const workerCount = 3
 	jobs := make(chan []string, workerCount)
 	results := make(chan book.Book, workerCount)
 
@@ -40,12 +40,7 @@ func ReadBookWithWorkerPool(path string) []book.Book {
 		close(results)
 	}()
 
-	var books []book.Book
-
-	for v := range results {
-		books = append(books, v)
-	}
-	return books
+	return results
 }
 
 func toStruct(jobs <-chan []string, results chan<- book.Book, wg *sync.WaitGroup, i int) {

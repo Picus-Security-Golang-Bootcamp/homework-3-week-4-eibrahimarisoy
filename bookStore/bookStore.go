@@ -3,6 +3,7 @@ package bookStore
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
@@ -41,9 +42,9 @@ func NewBookStore() (BookStore, error) {
 	return newBookStore, nil
 }
 
-func InsertSampleData(books []book.Book, a *author.AuthorRepository, b *book.BookRepository) {
+func InsertSampleData(results chan book.Book, a *author.AuthorRepository, b *book.BookRepository) {
 
-	for _, v := range books {
+	for v := range results {
 		newAuthor := a.InsertSampleData(&v.Author)
 		v.AuthorID = newAuthor.ID
 		b.InsertSampleData(v)
@@ -82,22 +83,22 @@ func (bs BookStore) Run(args []string) error {
 
 		PrintBooks(results)
 
-	// case "get":
-	// 	// if the user has not provided <bookID>
-	// 	if len(args) < 2 {
-	// 		return fmt.Errorf("No book id provided")
-	// 	}
+	case "get":
+		// if the user has not provided <bookID>
+		if len(args) < 2 {
+			return fmt.Errorf("No book id provided")
+		}
 
-	// 	bookId, err := strconv.Atoi(args[1])
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		bookId, err := strconv.Atoi(args[1])
+		if err != nil {
+			return err
+		}
 
-	// 	index, err := bs.Get(bookId)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	bs.Books[index].BookInfo()
+		result, err := bs.bookRepo.GetBookByIDWithAuthor(bookId)
+		if err != nil {
+			return err
+		}
+		fmt.Println(result.ToString())
 
 	// case "delete":
 	// 	// if the user has not provided <bookID>

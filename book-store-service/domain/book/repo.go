@@ -50,3 +50,13 @@ func (r *BookRepository) SearchBookNameWithKeyword(keyword string) ([]Book, erro
 	}
 	return books, nil
 }
+
+func (r *BookRepository) GetBookByIDWithAuthor(id int) (Book, error) {
+	var book Book
+
+	result := r.db.Preload("Author").Where("id = ?", id).First(&book)
+	if result.Error != nil {
+		return Book{}, result.Error
+	}
+	return book, nil
+}
