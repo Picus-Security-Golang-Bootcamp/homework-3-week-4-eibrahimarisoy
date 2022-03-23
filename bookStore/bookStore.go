@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/entities"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/repos"
 )
 
 type BookStore struct {
-	bookRepo   *book.BookRepository
-	authorRepo *author.AuthorRepository
+	BookRepo   *repos.BookRepository
+	AuthorRepo *repos.AuthorRepository
 }
 
 // NewBookStore creates a new BookStore
@@ -25,17 +25,17 @@ func NewBookStore() BookStore {
 	}
 
 	// Repositories
-	authorRepo := author.NewAuthorRepository(db)
+	authorRepo := repos.NewAuthorRepository(db)
 	authorRepo.Migrations()
 
-	bookRepo := book.NewBookRepository(db)
+	bookRepo := repos.NewBookRepository(db)
 	bookRepo.Migrations()
 
 	// Read CSV file and insert data into database with worker pool
 	ReadAndWriteBookWithWorkerPool("data.csv", bookRepo, authorRepo)
 
 	// initialize and return BookStore
-	return BookStore{bookRepo: bookRepo, authorRepo: authorRepo}
+	return BookStore{BookRepo: bookRepo, AuthorRepo: authorRepo}
 
 }
 
@@ -68,7 +68,7 @@ func (bs BookStore) Run(args []string) error {
 }
 
 // PrintBooks prints the books given
-func printBooks(books []book.Book) {
+func printBooks(books []entities.Book) {
 
 	for _, v := range books {
 		fmt.Println(v.ToString())
@@ -78,7 +78,7 @@ func printBooks(books []book.Book) {
 
 // list all books including deleted
 func (bs *BookStore) list() error {
-	results, err := bs.bookRepo.GetAllBooksWithAuthorInformation()
+	results, err := bs.BookRepo.GetBooksWithAuthor()
 	if err != nil {
 		return err
 	}
@@ -93,7 +93,7 @@ func (bs *BookStore) search(args []string) error {
 		return fmt.Errorf("No book name provided")
 	}
 
-	results, err := bs.bookRepo.SearchBookNameWithKeyword(strings.Join(args[1:], " "))
+	results, err := bs.BookRepo.FindByName(strings.Join(args[1:], " "))
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func (bs *BookStore) get(args []string) error {
 		return err
 	}
 
-	result, err := bs.bookRepo.GetBookByIDWithAuthor(bookId)
+	result, err := bs.BookRepo.GetByIDWithAuthor(bookId)
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func (bs *BookStore) delete(args []string) error {
 		return err
 	}
 
-	err = bs.bookRepo.DeleteBookByID(bookId)
+	err = bs.BookRepo.DeleteBookByID(bookId)
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func (bs *BookStore) buy(args []string) error {
 		return fmt.Errorf("Quantity must be greater than 0")
 	}
 
-	instance, err := bs.bookRepo.GetBookByIDWithAuthor(bookId)
+	instance, err := bs.BookRepo.GetByIDWithAuthor(bookId)
 
 	if err != nil {
 		return err
@@ -184,7 +184,7 @@ func (bs *BookStore) buy(args []string) error {
 		return fmt.Errorf("Not enough stock")
 	}
 
-	newInstance, err := bs.bookRepo.UpdateBookStockCount(&instance, instance.StockCount-quantity)
+	newInstance, err := bs.BookRepo.UpdateBookStockCount(&instance, instance.StockCount-quantity)
 	if err != nil {
 		return err
 	}

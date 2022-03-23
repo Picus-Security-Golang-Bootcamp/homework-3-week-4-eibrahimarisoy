@@ -7,16 +7,16 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/entities"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/repos"
 )
 
 // ReadBookWithWorkerPool reads the CSV file and write the book data into the database
-func ReadAndWriteBookWithWorkerPool(path string, bookRepo *book.BookRepository, authorRepo *author.AuthorRepository) {
+func ReadAndWriteBookWithWorkerPool(path string, bookRepo *repos.BookRepository, authorRepo *repos.AuthorRepository) {
 	const workerCount = 3
 
 	jobs := make(chan []string, workerCount)
-	results := make(chan book.Book, workerCount)
+	results := make(chan entities.Book, workerCount)
 
 	wg := sync.WaitGroup{}
 
@@ -51,7 +51,7 @@ func ReadAndWriteBookWithWorkerPool(path string, bookRepo *book.BookRepository, 
 }
 
 // toStruct converts the CSV line to a Book struct
-func toStruct(jobs <-chan []string, results chan<- book.Book, wg *sync.WaitGroup, i int) {
+func toStruct(jobs <-chan []string, results chan<- entities.Book, wg *sync.WaitGroup, i int) {
 	defer wg.Done()
 
 	// fmt.Println("worker", i, "started")
@@ -63,20 +63,20 @@ func toStruct(jobs <-chan []string, results chan<- book.Book, wg *sync.WaitGroup
 		price, _ := strconv.ParseFloat(line[3], 64)
 		authorID, _ := strconv.Atoi(line[6])
 
-		results <- book.Book{
+		results <- entities.Book{
 			Name:       line[0],
 			Pages:      pages,
 			StockCount: stockCount,
 			Price:      price,
 			StockCode:  line[4],
 			ISBN:       line[5],
-			Author:     author.Author{ID: uint(authorID), Name: line[7]},
+			Author:     entities.Author{ID: uint(authorID), Name: line[7]},
 		}
 	}
 }
 
 // WriteSampleBookToDB inserts sample data into the database
-func WriteSampleBookToDB(data book.Book, a *author.AuthorRepository, b *book.BookRepository) {
+func WriteSampleBookToDB(data entities.Book, a *repos.AuthorRepository, b *repos.BookRepository) {
 	newAuthor := a.InsertSampleData(&data.Author)
 	data.AuthorID = newAuthor.ID
 	b.InsertSampleData(data)

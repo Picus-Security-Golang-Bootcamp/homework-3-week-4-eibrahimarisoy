@@ -38,9 +38,13 @@ func main() {
 
 	args := os.Args[1:]
 
-	if err := bookStore.NewBookStore().Run(args); err != nil {
+	bs := bookStore.NewBookStore()
+
+	if err := bs.Run(args); err != nil {
 		usageAndExit(err.Error())
 	}
+
+	runExtraQuery(bs)
 
 }
 
@@ -52,4 +56,25 @@ func usageAndExit(msg string) {
 	fmt.Fprintf(os.Stderr, "\n")
 
 	os.Exit(1)
+}
+
+// runExtraQuery runs extra queries for homework
+func runExtraQuery(bs bookStore.BookStore) {
+	fmt.Println("\n\nExtra Queries:")
+	// get author by id
+	author, _ := bs.AuthorRepo.GetByID(1)
+
+	fmt.Println(author.ToString())
+
+	// get book by name
+	authors, _ := bs.AuthorRepo.FindByName("2")
+
+	for _, author := range authors {
+		fmt.Println(author.ToString())
+	}
+
+	// get author by id with books
+	author, _ = bs.AuthorRepo.GetAuthorWithBooks(1)
+	fmt.Println(author.ToString())
+
 }

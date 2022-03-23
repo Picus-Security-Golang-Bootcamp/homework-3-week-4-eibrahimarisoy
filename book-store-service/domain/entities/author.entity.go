@@ -1,4 +1,4 @@
-package author
+package entities
 
 import (
 	"fmt"
@@ -8,8 +8,9 @@ import (
 
 type Author struct {
 	gorm.Model
-	ID   uint   `gorm:"primarykey"`
-	Name string `json:"name" gorm:"unique"`
+	ID    uint   `gorm:"primarykey"`
+	Name  string `json:"name" gorm:"unique"`
+	Books []Book
 }
 
 func (Author) TableName() string {
@@ -17,5 +18,8 @@ func (Author) TableName() string {
 }
 
 func (a *Author) ToString() string {
+	if a.Books != nil {
+		return fmt.Sprintf("ID: %v Name: %s Books: %v", a.ID, a.Name, a.Books)
+	}
 	return fmt.Sprintf("ID: %v Name: %s", a.ID, a.Name)
 }

@@ -1,6 +1,7 @@
-package book
+package repos
 
 import (
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/entities"
 	"gorm.io/gorm"
 )
 
@@ -13,16 +14,16 @@ func NewBookRepository(db *gorm.DB) *BookRepository {
 }
 
 func (r *BookRepository) Migrations() {
-	r.db.AutoMigrate(&Book{})
+	r.db.AutoMigrate(&entities.Book{})
 }
 
-func (r *BookRepository) InsertSampleData(b Book) {
-	r.db.Unscoped().Omit("Author").Where(Book{Name: b.Name}).
+func (r *BookRepository) InsertSampleData(b entities.Book) {
+	r.db.Unscoped().Omit("Author").Where(entities.Book{Name: b.Name}).
 		FirstOrCreate(&b)
 }
 
-func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]Book, error) {
-	var books []Book
+func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]entities.Book, error) {
+	var books []entities.Book
 	result := r.db.Find(&books)
 
 	if result.Error != nil {
@@ -31,8 +32,8 @@ func (r *BookRepository) GetAllBooksWithoutAuthorInformation() ([]Book, error) {
 	return books, nil
 }
 
-func (r *BookRepository) GetAllBooksWithAuthorInformation() ([]Book, error) {
-	var books []Book
+func (r *BookRepository) GetBooksWithAuthor() ([]entities.Book, error) {
+	var books []entities.Book
 
 	result := r.db.Unscoped().Preload("Author").Order("id").Find(&books)
 	if result.Error != nil {
@@ -41,8 +42,8 @@ func (r *BookRepository) GetAllBooksWithAuthorInformation() ([]Book, error) {
 	return books, nil
 }
 
-func (r *BookRepository) SearchBookNameWithKeyword(keyword string) ([]Book, error) {
-	var books []Book
+func (r *BookRepository) FindByName(keyword string) ([]entities.Book, error) {
+	var books []entities.Book
 
 	result := r.db.Preload("Author").Where("name ILIKE ?", "%"+keyword+"%").Find(&books)
 	if result.Error != nil {
@@ -51,25 +52,25 @@ func (r *BookRepository) SearchBookNameWithKeyword(keyword string) ([]Book, erro
 	return books, nil
 }
 
-func (r *BookRepository) GetBookByIDWithAuthor(id int) (Book, error) {
-	var book Book
+func (r *BookRepository) GetByIDWithAuthor(id int) (entities.Book, error) {
+	var book entities.Book
 
 	result := r.db.Unscoped().Preload("Author").Where("id = ?", id).First(&book)
 	if result.Error != nil {
-		return Book{}, result.Error
+		return entities.Book{}, result.Error
 	}
 	return book, nil
 }
 
 func (r *BookRepository) DeleteBookByID(id int) error {
-	result := r.db.Where("id = ?", id).Delete(&Book{})
+	result := r.db.Where("id = ?", id).Delete(&entities.Book{})
 	if result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
-func (r *BookRepository) UpdateBookStockCount(b *Book, newStockCount int) (*Book, error) {
+func (r *BookRepository) UpdateBookStockCount(b *entities.Book, newStockCount int) (*entities.Book, error) {
 	tx := r.db.Model(&b).Update("stock_count", newStockCount)
 	if tx.Error != nil {
 		return nil, tx.Error

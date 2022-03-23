@@ -1,9 +1,8 @@
-package book
+package entities
 
 import (
 	"fmt"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/author"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +15,7 @@ type Book struct {
 	StockCode  string  `json:"stock_code"`
 	ISBN       string
 	AuthorID   uint `gorm:"foreignKey:ID"`
-	Author     author.Author
+	Author     Author
 }
 
 func (Book) TableName() string {
