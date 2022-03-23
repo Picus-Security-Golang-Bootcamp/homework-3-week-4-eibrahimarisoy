@@ -120,34 +120,45 @@ func (bs BookStore) Run(args []string) error {
 		fmt.Println("Deleting book id:", bookId)
 		fmt.Println(strings.Repeat("-", 50))
 
-	// case "buy":
-	// 	// if the user has not provided <bookID> or <quantity>
-	// 	if len(args) < 3 {
-	// 		return fmt.Errorf("No book id or quantity provided")
-	// 	}
+	case "buy":
+		// if the user has not provided <bookID> or <quantity>
+		if len(args) < 3 {
+			return fmt.Errorf("No book id or quantity provided")
+		}
 
-	// 	bookId, err := strconv.Atoi(args[1])
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		bookId, err := strconv.Atoi(args[1])
+		if err != nil {
+			return err
+		}
 
-	// 	quantity, err := strconv.Atoi(args[2])
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		quantity, err := strconv.Atoi(args[2])
+		if err != nil {
+			return err
+		}
 
-	// 	index, err := bs.Get(bookId)
+		if quantity < 1 {
+			return fmt.Errorf("Quantity must be greater than 0")
+		}
 
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		instance, err := bs.bookRepo.GetBookByIDWithAuthor(bookId)
 
-	// 	instance := bs.Books[index]
-	// 	if err := bs.Buy(instance, quantity); err != nil {
-	// 		return err
-	// 	}
+		if err != nil {
+			return err
+		}
 
-	// 	instance.BookInfo()
+		if instance.DeletedAt.Valid {
+			return fmt.Errorf("Book is not available")
+		}
+
+		if instance.StockCount < quantity {
+			return fmt.Errorf("Not enough stock")
+		}
+
+		newInstance, err := bs.bookRepo.UpdateBookStockCount(&instance, instance.StockCount-quantity)
+		if err != nil {
+			return err
+		}
+		fmt.Println(newInstance.ToString())
 
 	default:
 		return fmt.Errorf("Invalid command")

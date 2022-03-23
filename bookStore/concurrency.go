@@ -2,7 +2,6 @@ package bookStore
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 	"sync"
@@ -44,10 +43,10 @@ func ReadBookWithWorkerPool(path string) chan book.Book {
 }
 
 func toStruct(jobs <-chan []string, results chan<- book.Book, wg *sync.WaitGroup, i int) {
-	fmt.Println("worker", i, "started")
+	// fmt.Println("worker", i, "started")
 	defer wg.Done()
 	for line := range jobs {
-		fmt.Println("worker", i, "working on")
+		// fmt.Println("worker", i, "working on")
 
 		pages, _ := strconv.Atoi(line[1])
 		stockCount, _ := strconv.Atoi(line[2])

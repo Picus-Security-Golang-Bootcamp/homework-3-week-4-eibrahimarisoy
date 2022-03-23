@@ -68,3 +68,11 @@ func (r *BookRepository) DeleteBookByID(id int) error {
 	}
 	return nil
 }
+
+func (r *BookRepository) UpdateBookStockCount(b *Book, newStockCount int) (*Book, error) {
+	tx := r.db.Model(&b).Update("stock_count", newStockCount)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return b, nil
+}
