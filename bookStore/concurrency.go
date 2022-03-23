@@ -11,7 +11,7 @@ import (
 	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/book"
 )
 
-// ReadBookWithWorkerPool reads the CSV file and returns a channel of books
+// ReadBookWithWorkerPool reads the CSV file and write the book data into the database
 func ReadAndWriteBookWithWorkerPool(path string, bookRepo *book.BookRepository, authorRepo *author.AuthorRepository) {
 	const workerCount = 3
 
