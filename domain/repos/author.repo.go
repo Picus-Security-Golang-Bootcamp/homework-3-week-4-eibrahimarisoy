@@ -1,6 +1,8 @@
 package repos
 
 import (
+	"fmt"
+
 	entities "github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/entities"
 	"gorm.io/gorm"
 )
@@ -22,7 +24,7 @@ func (a *AuthorRepository) Migrations() {
 
 // InsertSampleData inserts sample data into the database
 func (a *AuthorRepository) InsertSampleData(author *entities.Author) entities.Author {
-	result := a.db.Where("name = ?", author.Name).FirstOrCreate(author)
+	result := a.db.Unscoped().Where("name = ?", author.Name).FirstOrCreate(author)
 
 	if result.Error != nil {
 		panic(result.Error) // TODO: handle error
@@ -53,7 +55,7 @@ func (a *AuthorRepository) FindByName(name string) ([]entities.Author, error) {
 }
 
 // GetAuthorsWithBooks returns author with books
-func (a *AuthorRepository) GetAuthorWithBooks(id int) (entities.Author, error) {
+func (a *AuthorRepository) GetByIDWithBooks(id int) (entities.Author, error) {
 	var author entities.Author
 
 	result := a.db.Preload("Books").Where("id = ?", id).First(&author)
@@ -71,4 +73,25 @@ func (a *AuthorRepository) GetAuthorsWithBooks() ([]entities.Author, error) {
 		return []entities.Author{}, result.Error
 	}
 	return authors, nil
+}
+
+// **************EXTRA QUERIES************** //
+
+// DeleteAuthorByID deletes author by id
+func (a *AuthorRepository) DeleteAuthorByID(id int) error {
+	result := a.db.Where("id = ?", id).Delete(&entities.Author{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+// UpdateAuthorName updates author name
+func (a *AuthorRepository) UpdateAuthorName(author *entities.Author) error {
+	fmt.Println("UpdateAuthor", author.Name)
+	result := a.db.Model(&author).Where("id = ?", author.ID).Update("name", author.Name)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

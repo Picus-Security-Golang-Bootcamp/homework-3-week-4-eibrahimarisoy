@@ -84,7 +84,7 @@ func runQueries(bs BookStore) {
 	}
 
 	// get author by id with books
-	author, _ = bs.AuthorRepo.GetAuthorWithBooks(1)
+	author, _ = bs.AuthorRepo.GetByIDWithBooks(1)
 	fmt.Println(author.ToString())
 
 	// get authors with books
@@ -93,4 +93,62 @@ func runQueries(bs BookStore) {
 		fmt.Println(author.ToString())
 	}
 
+	// *******EXTRA QUERIES********
+
+	// delete author by id
+	_ = bs.AuthorRepo.DeleteAuthorByID(2)
+
+	// update author
+	author.Name = "Eibrahim"
+	err := bs.AuthorRepo.UpdateAuthorName(&author)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	// Update book name
+	book, _ := bs.BookRepo.GetByID(15)
+	bs.BookRepo.UpdateBookName(book, "New Book Name")
+
+	// Update book price
+	book, _ = bs.BookRepo.GetByID(15)
+	bs.BookRepo.UpdateBookPrice(book, 333.3333)
+
+	// Filter books by price
+	books, _ := bs.BookRepo.FilterBookByPriceRange(100.0, 200.0)
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+
+	// Get books with given ids
+	books, _ = bs.BookRepo.GetBooksWithIDs([]int{1, 2, 3, 4, 5})
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+
+	// Filter books with created_at between dates
+	books, _ = bs.BookRepo.FilterBookByCreatedAtRange("2020-01-01", "2020-01-02")
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+
+	// Search books name and stock code with given keyword
+	fmt.Println("\n\nSearch books name and stock code with given keyword:")
+	books, _ = bs.BookRepo.SearchBookByNameOrStockCode("20")
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+
+	// GetAllBooksOrderByPriceAsc returns books ordered by price ascending
+	fmt.Println("\n\nGetAllBooksOrderByPriceAsc returns books ordered by price ascending:")
+	books, _ = bs.BookRepo.GetAllBooksOrderByPriceAsc()
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
+
+	// GetFirstTenBooks returns first ten books
+	fmt.Println("\n\nGetFirstTenBooks returns first ten books:")
+	books, _ = bs.BookRepo.GetFirstTenBooks()
+	for _, book := range books {
+		fmt.Println(book.ToString())
+	}
 }

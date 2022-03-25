@@ -21,7 +21,7 @@ func (r *BookRepository) Migrations() {
 
 // InsertSampleData inserts sample data into the database
 func (r *BookRepository) InsertSampleData(b entities.Book) {
-	r.db.Unscoped().Omit("Author").Where(entities.Book{Name: b.Name}).
+	r.db.Unscoped().Omit("Author").Where(entities.Book{Name: b.Name, StockCode: b.StockCode}).
 		FirstOrCreate(&b)
 }
 
@@ -69,6 +69,17 @@ func (r *BookRepository) GetByIDWithAuthor(id int) (entities.Book, error) {
 	return book, nil
 }
 
+// GetByIDWithAuthor returns books by ID
+func (r *BookRepository) GetByID(id int) (entities.Book, error) {
+	var book entities.Book
+
+	result := r.db.Unscoped().Where("id = ?", id).First(&book)
+	if result.Error != nil {
+		return entities.Book{}, result.Error
+	}
+	return book, nil
+}
+
 // DeleteBookByID deletes book by ID
 func (r *BookRepository) DeleteBookByID(id int) error {
 	result := r.db.Where("id = ?", id).Delete(&entities.Book{})
@@ -85,4 +96,88 @@ func (r *BookRepository) UpdateBookStockCountByID(id, newStockCount int) (entiti
 	r.db.Model(&instance).Update("stock_count", newStockCount)
 
 	return instance, nil
+}
+
+// **************EXTRA QUERIES************** //
+
+// UpdateBookName updates book name
+func (r *BookRepository) UpdateBookName(book entities.Book, newName string) (entities.Book, error) {
+	book.Name = newName
+	r.db.Model(&book).Update("name", newName)
+
+	return book, nil
+}
+
+// UpdateBookPrice updates book price
+func (r *BookRepository) UpdateBookPrice(book entities.Book, newPrice float64) (entities.Book, error) {
+	book.Price = newPrice
+	r.db.Model(&book).Update("price", newPrice)
+
+	return book, nil
+}
+
+// FilterBookByPriceRange filters book by price range
+func (r *BookRepository) FilterBookByPriceRange(min, max float64) ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Unscoped().Where("price BETWEEN ? AND ?", min, max).Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
+
+// GetBooksWithIDs returns books by IDs
+func (r *BookRepository) GetBooksWithIDs(ids []int) ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Where("id IN ?", ids).Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
+
+// FilterBookByCreatedAtRange filters book by created at range
+func (r *BookRepository) FilterBookByCreatedAtRange(min, max string) ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Unscoped().Where("created_at BETWEEN ? AND ?", min, max).Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
+
+// SearchBookByNameAndStockCode searches book by name and stock code
+func (r *BookRepository) SearchBookByNameOrStockCode(keyword string) ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Unscoped().Where("name ILIKE ? ", "%"+keyword+"%").Or("stock_code ILIKE ?", "%"+keyword+"%").Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
+
+// GetAllBooksOrderByPriceAsc returns all books order by price asc
+func (r *BookRepository) GetAllBooksOrderByPriceAsc() ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Unscoped().Order("price asc").Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
+}
+
+// GetFirstTenBooks returns first ten books
+func (r *BookRepository) GetFirstTenBooks() ([]entities.Book, error) {
+	var books []entities.Book
+
+	result := r.db.Unscoped().Limit(10).Find(&books)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return books, nil
 }

@@ -17,7 +17,7 @@ type Book struct {
 	StockCode  string  `json:"stock_code" gorm:"unique"`
 	ISBN       string  `gorm:"unique"`
 	AuthorID   uint
-	Author     Author
+	Author     Author `gorm:"OnDelete:SET NULL"`
 }
 
 func (Book) TableName() string {
