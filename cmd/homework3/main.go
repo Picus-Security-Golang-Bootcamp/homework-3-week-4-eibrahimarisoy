@@ -5,9 +5,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/file"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/repos"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/repos"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/pkg/common/db"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/pkg/common/file"
 	"github.com/joho/godotenv"
 )
 

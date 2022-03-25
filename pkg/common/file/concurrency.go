@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/entities"
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/repos"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/entities"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/repos"
 )
 
 // ReadBookWithWorkerPool reads the CSV file and write the book data into the database

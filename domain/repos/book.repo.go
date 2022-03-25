@@ -1,7 +1,7 @@
 package repos
 
 import (
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/entities"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/entities"
 	"gorm.io/gorm"
 )
 
