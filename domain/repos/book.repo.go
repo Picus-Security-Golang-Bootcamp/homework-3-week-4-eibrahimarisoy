@@ -81,7 +81,7 @@ func (r *BookRepository) DeleteBookByID(id int) error {
 // UpdateBookStockCountByID updates book stock count by ID
 func (r *BookRepository) UpdateBookStockCountByID(id, newStockCount int) (entities.Book, error) {
 	instance, _ := r.GetByIDWithAuthor(id)
-	instance.StockCount = newStockCount
+	instance.StockCount = uint(newStockCount)
 	r.db.Model(&instance).Update("stock_count", newStockCount)
 
 	return instance, nil

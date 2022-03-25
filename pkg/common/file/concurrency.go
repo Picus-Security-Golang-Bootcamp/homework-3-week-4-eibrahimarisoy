@@ -63,8 +63,8 @@ func toStruct(jobs <-chan []string, results chan<- entities.Book, wg *sync.WaitG
 
 		results <- entities.Book{
 			Name:       line[0],
-			Pages:      pages,
-			StockCount: stockCount,
+			Pages:      uint(pages),
+			StockCount: uint(stockCount),
 			Price:      price,
 			StockCode:  line[4],
 			ISBN:       line[5],

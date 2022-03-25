@@ -8,13 +8,12 @@ import (
 
 type Author struct {
 	gorm.Model
-	ID    uint   `gorm:"primarykey"`
 	Name  string `json:"name" gorm:"unique"`
 	Books []Book
 }
 
 func (Author) TableName() string {
-	return "author"
+	return "authors"
 }
 
 func (a *Author) ToString() string {
