@@ -1,30 +1,20 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
 
-	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/bookStore"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/db"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/common/file"
+	"github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/book-store-service/domain/repos"
 	"github.com/joho/godotenv"
 )
 
-// define usage information
-var usage = `Usage: ./ [commands...] [parameters...]
-
-Commands:
-	-list
-	-search <bookName>
-	-get <bookID>
-	-delete <bookID>
-	-buy <bookID> <quantity>
-
-Parameters:
-	-keyword: string
-	-bookID: int
-	-quantity: int
-`
+type BookStore struct {
+	BookRepo   *repos.BookRepository
+	AuthorRepo *repos.AuthorRepository
+}
 
 func main() {
 	// Set environment variables
@@ -32,43 +22,63 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(usage))
+	// connect postgres database
+	db, err := db.NewPsqlDB()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	args := os.Args[1:]
+	// Repositories
+	authorRepo := repos.NewAuthorRepository(db)
+	authorRepo.Migrations()
 
-	bs := bookStore.NewBookStore()
+	bookRepo := repos.NewBookRepository(db)
+	bookRepo.Migrations()
 
-	if err := bs.Run(args); err != nil {
-		usageAndExit(err.Error())
-	}
+	// Read CSV file and insert data into database with worker pool
+	file.ReadAndWriteBookWithWorkerPool(os.Getenv("FILE_PATH"), bookRepo, authorRepo)
 
-	runExtraQuery(bs)
+	// initialize and return BookStore
+	bs := BookStore{BookRepo: bookRepo, AuthorRepo: authorRepo}
 
-}
+	runQueries(bs)
 
-// usageAndExit prints the usage information and exits with the given error message.
-func usageAndExit(msg string) {
-	fmt.Fprintf(os.Stderr, msg)
-	fmt.Fprintf(os.Stderr, "\n\n")
-	flag.Usage()
-	fmt.Fprintf(os.Stderr, "\n")
-
-	os.Exit(1)
 }
 
 // runExtraQuery runs extra queries for homework
-func runExtraQuery(bs bookStore.BookStore) {
+func runQueries(bs BookStore) {
 	fmt.Println("\n\nExtra Queries:")
+
+	// list
+	results, _ := bs.BookRepo.GetBooksWithAuthor()
+	for _, book := range results {
+		fmt.Println(book.ToString())
+	}
+
+	// search
+	results, _ = bs.BookRepo.FindByName("keyword")
+	for _, book := range results {
+		fmt.Println(book.ToString())
+	}
+
+	// get
+	result, _ := bs.BookRepo.GetByIDWithAuthor(5)
+	fmt.Println(result.ToString())
+
+	// delete
+	_ = bs.BookRepo.DeleteBookByID(5)
+
+	// buy
+	result, _ = bs.BookRepo.UpdateBookStockCountByID(1, 5)
+	fmt.Println(result.ToString())
+
 	// get author by id
 	author, _ := bs.AuthorRepo.GetByID(1)
 
 	fmt.Println(author.ToString())
 
 	// get book by name
-	authors, _ := bs.AuthorRepo.FindByName("2")
-
+	authors, _ := bs.AuthorRepo.FindByName("author")
 	for _, author := range authors {
 		fmt.Println(author.ToString())
 	}
@@ -76,5 +86,11 @@ func runExtraQuery(bs bookStore.BookStore) {
 	// get author by id with books
 	author, _ = bs.AuthorRepo.GetAuthorWithBooks(1)
 	fmt.Println(author.ToString())
+
+	// get authors with books
+	authors, _ = bs.AuthorRepo.GetAuthorsWithBooks()
+	for _, author := range authors {
+		fmt.Println(author.ToString())
+	}
 
 }

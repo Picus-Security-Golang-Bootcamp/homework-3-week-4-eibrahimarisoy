@@ -1,8 +1,7 @@
-package bookStore
+package file
 
 import (
 	"encoding/csv"
-	"fmt"
 	"os"
 	"strconv"
 	"sync"
@@ -13,7 +12,7 @@ import (
 
 // ReadBookWithWorkerPool reads the CSV file and write the book data into the database
 func ReadAndWriteBookWithWorkerPool(path string, bookRepo *repos.BookRepository, authorRepo *repos.AuthorRepository) {
-	const workerCount = 3
+	const workerCount = 5
 
 	jobs := make(chan []string, workerCount)
 	results := make(chan entities.Book, workerCount)
@@ -56,12 +55,11 @@ func toStruct(jobs <-chan []string, results chan<- entities.Book, wg *sync.WaitG
 
 	// fmt.Println("worker", i, "started")
 	for line := range jobs {
-		fmt.Println("worker", i, "working on", line)
+		// fmt.Println("worker", i, "working on", line)
 
 		pages, _ := strconv.Atoi(line[1])
 		stockCount, _ := strconv.Atoi(line[2])
 		price, _ := strconv.ParseFloat(line[3], 64)
-		authorID, _ := strconv.Atoi(line[6])
 
 		results <- entities.Book{
 			Name:       line[0],
@@ -70,7 +68,7 @@ func toStruct(jobs <-chan []string, results chan<- entities.Book, wg *sync.WaitG
 			Price:      price,
 			StockCode:  line[4],
 			ISBN:       line[5],
-			Author:     entities.Author{ID: uint(authorID), Name: line[7]},
+			Author:     entities.Author{Name: line[6]},
 		}
 	}
 }

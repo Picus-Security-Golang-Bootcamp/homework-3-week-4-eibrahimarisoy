@@ -6,6 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
+type BookSlice []Book
+
 type Book struct {
 	gorm.Model
 	Name       string  `json:"name"`
@@ -14,8 +16,8 @@ type Book struct {
 	Price      float64 `json:"price"`
 	StockCode  string  `json:"stock_code"`
 	ISBN       string
-	AuthorID   uint `gorm:"foreignKey:ID"`
-	Author     Author
+	AuthorID   uint
+	Author     Author `gorm:"foreignkey:AuthorID"`
 }
 
 func (Book) TableName() string {
@@ -27,4 +29,10 @@ func (b *Book) ToString() string {
 		return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s AuthorID: %v AuthorName: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.Author.ID, b.Author.Name, b.DeletedAt)
 	}
 	return fmt.Sprintf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.DeletedAt)
+}
+
+func (bs BookSlice) PrintBooks() {
+	for _, b := range bs {
+		fmt.Printf("ID: %v Name: %s Pages: %v StockCount: %v Price: %v StockCode: %s ISBN: %s DeletedAt: %v", b.ID, b.Name, b.Pages, b.StockCount, b.Price, b.StockCode, b.ISBN, b.DeletedAt)
+	}
 }

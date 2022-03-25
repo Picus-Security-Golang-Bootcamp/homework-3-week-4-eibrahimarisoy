@@ -9,25 +9,31 @@ type AuthorRepository struct {
 	db *gorm.DB
 }
 
+// NewAuthorRepository returns a new AuthorRepository
 func NewAuthorRepository(db *gorm.DB) *AuthorRepository {
 	return &AuthorRepository{db: db}
 
 }
 
+// Migrations runs the database migrations
 func (a *AuthorRepository) Migrations() {
 	a.db.AutoMigrate(&entities.Author{})
 }
 
+// InsertSampleData inserts sample data into the database
 func (a *AuthorRepository) InsertSampleData(author *entities.Author) entities.Author {
-	result := a.db.FirstOrCreate(author)
+	result := a.db.Where("name = ?", author.Name).FirstOrCreate(author)
+
 	if result.Error != nil {
-		panic(result.Error)
+		panic(result.Error) // TODO: handle error
 	}
 	return *author
 }
 
+// GetByID returns an author by id
 func (a *AuthorRepository) GetByID(id int) (entities.Author, error) {
 	var author entities.Author
+
 	result := a.db.Where("id = ?", id).First(&author)
 	if result.Error != nil {
 		return entities.Author{}, result.Error
@@ -35,6 +41,7 @@ func (a *AuthorRepository) GetByID(id int) (entities.Author, error) {
 	return author, nil
 }
 
+// FindByName returns an author by name
 func (a *AuthorRepository) FindByName(name string) ([]entities.Author, error) {
 	var authors []entities.Author
 
@@ -45,8 +52,10 @@ func (a *AuthorRepository) FindByName(name string) ([]entities.Author, error) {
 	return authors, nil
 }
 
+// GetAuthorsWithBooks returns author with books
 func (a *AuthorRepository) GetAuthorWithBooks(id int) (entities.Author, error) {
 	var author entities.Author
+
 	result := a.db.Preload("Books").Where("id = ?", id).First(&author)
 	if result.Error != nil {
 		return entities.Author{}, result.Error
@@ -54,15 +63,12 @@ func (a *AuthorRepository) GetAuthorWithBooks(id int) (entities.Author, error) {
 	return author, nil
 }
 
-/*	var author Author
-	var books []Book
-
-	result := a.db.Where("id = ?", id).First(&author)
+// GetAuthorsWithBooks returns authors with books
+func (a *AuthorRepository) GetAuthorsWithBooks() ([]entities.Author, error) {
+	var authors []entities.Author
+	result := a.db.Preload("Books").Find(&authors)
 	if result.Error != nil {
-		return Author{}, nil, result.Error
+		return []entities.Author{}, result.Error
 	}
-	result = a.db.Model(&author).Related(&books)
-	if result.Error != nil {
-		return Author{}, nil, result.Error
-	}
-	return author, books, nil*/
+	return authors, nil
+}
