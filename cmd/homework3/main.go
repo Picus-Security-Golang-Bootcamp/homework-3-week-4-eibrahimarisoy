@@ -132,23 +132,33 @@ func runQueries(bs BookStore) {
 	}
 
 	// Search books name and stock code with given keyword
-	fmt.Println("\n\nSearch books name and stock code with given keyword:")
 	books, _ = bs.BookRepo.SearchBookByNameOrStockCode("20")
 	for _, book := range books {
 		fmt.Println(book.ToString())
 	}
 
 	// GetAllBooksOrderByPriceAsc returns books ordered by price ascending
-	fmt.Println("\n\nGetAllBooksOrderByPriceAsc returns books ordered by price ascending:")
 	books, _ = bs.BookRepo.GetAllBooksOrderByPriceAsc()
 	for _, book := range books {
 		fmt.Println(book.ToString())
 	}
 
 	// GetFirstTenBooks returns first ten books
-	fmt.Println("\n\nGetFirstTenBooks returns first ten books:")
 	books, _ = bs.BookRepo.GetFirstTenBooks()
 	for _, book := range books {
 		fmt.Println(book.ToString())
 	}
+
+	// GetBooksCount returns number of books
+	count, _ := bs.BookRepo.GetCount()
+	fmt.Println(count)
+
+	// GetTotalStockCount returns total stock count
+	count, _ = bs.BookRepo.GetTotalStockValue()
+	fmt.Println(count)
+
+	// GetAvgPrice returns average price
+	avgPrice, _ := bs.BookRepo.GetAvgPrice()
+	fmt.Println(avgPrice)
+
 }

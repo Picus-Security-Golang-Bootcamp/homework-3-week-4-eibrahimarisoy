@@ -181,3 +181,36 @@ func (r *BookRepository) GetFirstTenBooks() ([]entities.Book, error) {
 	}
 	return books, nil
 }
+
+// GetBooksCount returns books count
+func (r *BookRepository) GetCount() (int64, error) {
+	var count int64
+
+	result := r.db.Model(&entities.Book{}).Count(&count)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	return count, nil
+}
+
+// GetTotalStockValue returns total stock value
+func (r *BookRepository) GetTotalStockValue() (int64, error) {
+	var count int64
+
+	err := r.db.Model(&entities.Book{}).Select("sum(stock_count)").Row().Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+// GetAvgPrice returns average price
+func (r *BookRepository) GetAvgPrice() (float64, error) {
+	var avgPrice float64
+
+	err := r.db.Model(&entities.Book{}).Select("avg(price)").Row().Scan(&avgPrice)
+	if err != nil {
+		return 0, err
+	}
+	return avgPrice, nil
+}

@@ -1,8 +1,6 @@
 package repos
 
 import (
-	"fmt"
-
 	entities "github.com/Picus-Security-Golang-Bootcamp/homework-3-week-4-eibrahimarisoy/domain/entities"
 	"gorm.io/gorm"
 )
@@ -88,7 +86,6 @@ func (a *AuthorRepository) DeleteAuthorByID(id int) error {
 
 // UpdateAuthorName updates author name
 func (a *AuthorRepository) UpdateAuthorName(author *entities.Author) error {
-	fmt.Println("UpdateAuthor", author.Name)
 	result := a.db.Model(&author).Where("id = ?", author.ID).Update("name", author.Name)
 	if result.Error != nil {
 		return result.Error
